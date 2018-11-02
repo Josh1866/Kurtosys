@@ -1,6 +1,6 @@
 # Kurtosys
 Test
-Functional UI Test ( Imanage to teach myself selenium over 2 days and i got stuck with the code and only manage to get this done 
+Functional UI Test ( I manage to teach myself selenium over 2 days and i got stuck with the code and only manage to get this done 
 ---
 package co.edureka.selenium.webdriver.basic;
 
