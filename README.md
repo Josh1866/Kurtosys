@@ -67,3 +67,19 @@ public class Day1 {
 
 
 
+
+
+Functional API Test
+---
+
+pm.test("Status code is 200", function () {
+    pm.response.to.have.status(200);
+});
+pm.test("Body matches string", function () {
+    pm.expect(pm.response.text()).to.include("data").to.contain("records")>0;
+});
+
+pm.test("Body matches string", function () {
+    pm.expect(pm.response.text()).to.include("JPMorgan");
+});
+
