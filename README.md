@@ -27,8 +27,15 @@ public class Day1 {
 			driver.manage().timeouts().pageLoadTimeout(30, TimeUnit.SECONDS);
 			
 			driver.get("https://am.jpmorgan.com/gb/en/asset-management/gim/adv/home");
-			inputName();
-			inputClick();
+			 driver.findElement(By.xpath("//*[@id=\"ng-app\"]/body/div[5]/div/div/div/div/div[2]/div[4]/div[2]/div")).click();
+			 driver.findElement(By.xpath("//*[@id=\"Home\"]/div/div[2]/div/div[2]/ul[1]/li[1]/a/span[1]")).click();
+			 driver.findElement(By.xpath("//*[@id=\"Home\"]/div/div[2]/div/div[2]/ul[1]/li[1]/a")).click();
+			 jse = (JavascriptExecutor)driver;
+			 String currentURL = driver.getCurrentUrl();
+			 System.out.print(currentURL);
+			  jse = (JavascriptExecutor)driver;
+			  jse.executeScript("scroll(0, 1000)");
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -36,17 +43,14 @@ public class Day1 {
 }
 	
 	public void inputClick() {
-	  driver.findElement(By.name("Accept the disclaimer")).click();
-	  jse = (JavascriptExecutor)driver;
-	  jse.executeScript("scroll(0, 1000)");
+		
+	
 	  
+	 
 	 
 	}
 	public void inputName() {
-	 driver.findElement(By.id("ng-app"));
-	 driver.findElement(By.className("icon-rightchevron")).click();
-	  jse = (JavascriptExecutor)driver;
-	  jse.executeScript("scroll(0, 1000)");
+	 ; 
 	  
 	 
 	}
@@ -61,9 +65,6 @@ public class Day1 {
 	}
 
 }
-
-
-
 
 
 
