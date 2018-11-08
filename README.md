@@ -46,10 +46,10 @@ public class Day1 {
 			 driver.findElement(By.linkText("Find a fund")).click();
 			 System.out.println("Title of page is:" + driver.getTitle());
 			 driver.findElement(By.linkText("Find a fund")).click();
-			 driver.get(currentURL);
+			 
 			 jse = (JavascriptExecutor)driver;
 			  jse.executeScript("scroll(0, 1000)");
-			  driver.get(currentURL);
+			 
 			 
 
 		} catch (Exception e) {
