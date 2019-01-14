@@ -1,15 +1,9 @@
-version: 2
-jobs:
-  test:
-    docker:
-      # specify the version you desire here
-      - image: circleci/ruby:2.5
-        environment:
-          RAILS_ENV: test
-          DATABASE_NAME: mv_test
-          DATABASE_USERNAME: root
-          DATABASE_PASSWORD: ''
-          DATABASE_HOST: 127.0.0.1
-          # SELENIUM_URL: http://localhost:4444/wd/hub
+# start.yml
+extends: 'super.yml'
+data:
+    name: 'Mr. Superman'
+    age: 134    
+    favorites:
+        - 'Raspberrys'
 
     
