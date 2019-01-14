@@ -1,21 +1,79 @@
-.tests:
-  only:
-    - pushes
+defaults: &defaults
+  working_directory: ~/markovmodel/PyEMMA
+  docker:
+    - image: continuumio/miniconda3
 
-.rspec:
-  extends: .tests
-  script: rake rspec
+#inst_conda_bld: &inst_conda_bld
+#  - run: conda config --add channels conda-forge
+#  - run: conda config --set always_yes true
+#  - run: conda config --set quiet true
+#  - run: conda install conda-build
 
-rspec 1:
-  variables:
-    RSPEC_SUITE: '1'
-  extends: .rspec
+version: 2
 
-rspec 2:
-  variables:
-    RSPEC_SUITE: '2'
-  extends: .rspec
+jobs:
+  build:
+    <<: *defaults
+    parallelism: 1
+    steps:
+      - checkout
+      - run: git fetch --unshallow || true
+      - run: conda config --add channels conda-forge
+      - run: conda config --set always_yes true
+      - run: conda config --set quiet true
+      - run: conda install conda-build
+      - run: conda build devtools/conda-recipe --python=3.6 --no-test
+      #- store_artifacts:
+      #    path: $(conda build devtools/conda-recipe --python=3.6 --output)
+      #    destination: build.tar.bz2
+      # Persist the specified paths (workspace/echo-output) into the workspace for use in downstream job.
+      - persist_to_workspace:
+          root: $( dirname $(conda build devtools/conda-recipe --python=3.6 --output) )
+          paths:
+            - $(conda build devtools/conda-recipe --python=3.6 --output)
 
-spinach:
-  extends: .tests
-  script: rake spinach
+
+  test:
+    <<: *defaults
+    parallelism: 4
+    environment:
+      CIRCLE_ARTIFACTS: /tmp/circleci-artifacts
+      CIRCLE_TEST_REPORTS: /tmp/circleci-test-results
+      PYTHONHASHSEED: 0
+      OMP_NUM_THREADS: 1
+      PYEMMA_NJOBS: 1
+
+    steps:
+      - checkout
+
+      - run: mkdir -p $CIRCLE_ARTIFACTS $CIRCLE_TEST_REPORTS
+      - run: conda config --add channels conda-forge
+      - run: conda config --set always_yes true
+      - run: conda config --set quiet true
+      - run: conda install conda-build
+      - attach_workspace:
+          # Must be absolute path or relative path from working_directory
+          at:  $( dirname $(conda build devtools/conda-recipe --python=3.6 --output) )
+      #- run: wget https://circleci.com/api/v1.1/project/:vcs-type/:org/:repo/:build_num/artifacts/0/build.tar.bz2 -o `conda build devtools/conda-recipe --python=3.6 --output`
+      #- run: wget curl https://circleci.com/api/v1.1/project/:git/:CIRCLE_PROJECT_USERNAME/:$CIRCLE_PROJECT_REPONAME/:$CIRCLE_BUILD_NUM/artifacts?circle-token=$CIRCLE_TOKEN
+      - run: conda build devtools/conda-recipe --python=3.6 --test
+      # Teardown
+      #   If you break your build into multiple jobs with workflows, you will probably want to do the parts of this that are relevant in each
+      # Save test results
+      - store_test_results:
+          path: /tmp/circleci-test-results
+      # Save artifacts
+      - store_artifacts:
+          path: /tmp/circleci-artifacts
+      - store_artifacts:
+          path: /tmp/circleci-test-results
+
+
+workflows:
+  version: 2
+  build_and_test:
+    jobs:
+      - build
+      - test:
+        requires:
+          - build
