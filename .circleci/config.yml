@@ -11,8 +11,8 @@ jobs:
       - image: circleci/build-image:ubuntu-14.04-XL-922-9410082
       - image: circleci/mysql:5.7.22
         environment:
-          MYSQL_ROOT_PASSWORD: root@123
-          MYSQL_DATABASE: circle_bigquery
+          MYSQL_ROOT_PASSWORD: Mysp@ce41
+          MYSQL_DATABASE: josh_home
       - image: circleci/mongo:3-ram
 
     steps:
@@ -39,10 +39,7 @@ jobs:
             . venv/bin/activate
             pip install setuptools==20.3
             pip install -r requirements.txt
-      - save_cache:
-          paths:
-            - ./venv
-          key: v1-dependencies-{{ checksum "requirements.txt" }}
+
       - run:
           name: run tests
           environment:
