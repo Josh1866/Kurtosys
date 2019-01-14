@@ -1,6 +1,6 @@
 # Kurtosys
 Test
-Functional UI Test ( I manage to teach myself selenium over 2 days and i got stuck with the code and only manage to get this done 
+Functional UI Test 
 ---
 package co.kurtosys.selenium.webdriver.basic;
 import org.openqa.selenium.By;
