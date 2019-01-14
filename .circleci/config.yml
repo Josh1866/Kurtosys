@@ -47,4 +47,4 @@ jobs:
             TEST_MONGO_MODE: 1
           command: |
             . venv/bin/activate
-            python manage.py test -v 2 --with-nicedots --exclude-dir=common/mediation/management/commands/ --exclude-dir=apps/waffle/tests/ --exclude-dir=common/tests/ --exclude-dir=common/feeplus/tests/
+            python manage.py test -v 2 --with-nicedots --exclude-dir=common/mediation/management/commands/ --exclude-dir=common/tests/ --exclude-dir=common/feeplus/tests/
