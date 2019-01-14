@@ -1,5 +1,30 @@
-imports:
-    - { resource: common.yml }
-whatever:
-    thing: "%yaml_to_repeat%"
-    other_thing: "%yaml_to_repeat%"
+version: 2
+
+jobs:
+  build:
+    machine: &id001
+      environment:
+        NODE_ENV: test
+        ...
+      node:
+        version: 6
+    steps:
+      - checkout
+      - run: npm install
+      ...
+
+  deploy:
+    machine: *id001
+    steps:
+      - checkout
+      - run: npm install
+      - run: npm run deploy:staging
+
+workflows:
+  version: 2
+  build-and-deploy:
+    jobs:
+      - build
+      - deploy:
+        requires:
+          - build
