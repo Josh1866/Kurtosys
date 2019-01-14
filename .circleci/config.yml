@@ -1,35 +1,21 @@
----
+.tests:
+  only:
+    - pushes
 
-- name: Installing Rocketseed
-  hosts: localhost
-  become: yes
+.rspec:
+  extends: .tests
+  script: rake rspec
 
-  vars:
-    rocketseed_version: "7.0.0"
-    rocketseed_dir: '/rocketseed'
-    rocketseed_tarball: '{{ rocketseed_dir }}/rocketseed-{{ rocketseed_version }}-ansible-bin.tar.bz2'
-    sitename: 172.23.23.40
+rspec 1:
+  variables:
+    RSPEC_SUITE: '1'
+  extends: .rspec
 
-  pre_tasks:
-    - file:
-        path: '{{ rocketseed_dir }}'
-        state: directory
+rspec 2:
+  variables:
+    RSPEC_SUITE: '2'
+  extends: .rspec
 
-    - name: Copy rocketseed files
-      command: "scp -o \"StrictHostKeyChecking no\" rocketeer@u16build.rocketseed.com:/home/rocketeer/escrow/7.0.0-current/{{ item }} {{ rocketseed_dir }}/{{ item }}"
-      with_items:
-        - rocketseed-7.0.0-ansible-bin.tar.bz2
-        - datawarehouse.pgsql
-        - drupal-7.tar.gz
-        - wkhtmltox-0.12.4_linux-generic-amd64.tar.xz
-
-  roles:
-    - common
-    - admin-users
-    - database
-    - datawarehouse
-    - escrow-mta
-    - d7-gui
-    - drupal-7
-    - zabbix-agent
-    - pgtune
+spinach:
+  extends: .tests
+  script: rake spinach
