@@ -1,30 +1,101 @@
 version: 2
-
 jobs:
-  build:
-    machine: &id001
-      environment:
-        NODE_ENV: test
-        ...
-      node:
-        version: 6
+  test:
+    docker:
+      # specify the version you desire here
+      - image: circleci/ruby:2.5
+        environment:
+          RAILS_ENV: test
+          DATABASE_NAME: mv_test
+          DATABASE_USERNAME: root
+          DATABASE_PASSWORD: ''
+          DATABASE_HOST: 127.0.0.1
+          # SELENIUM_URL: http://localhost:4444/wd/hub
+
+    working_directory: ~/admin
+
     steps:
       - checkout
-      - run: npm install
-      ...
+
+      # Download and cache dependencies
+      - restore_cache:
+          keys:
+            - gem-cache-{{ arch }}-{{ checksum "Gemfile.lock" }}
+            - gem-cache-{{ arch }}
+            - gem-cache
+
+      - run:
+          name: install gems
+          command: bundle install --path vendor/cache
+
+      - save_cache:
+          key: gem-cache-{{ arch }}-{{ checksum "Gemfile.lock" }}
+          paths:
+            - vendor/cache
+
+      # Database setup
+      - run:
+          name: Setup Database
+          command: |
+            bundle exec rake db:create
+            bundle exec rake db:schema:load
+
+      # run tests!
+      - run:
+          name: run tests
+          command: |
+            mkdir /tmp/test-results
+            TEST_FILES="$(circleci tests glob "spec/**/*_spec.rb" | circleci tests split)"
+
+            bundle exec rspec --format progress ${TEST_FILES}
+
+      - store_artifacts:
+          path: coverage
+          destination: coverage
+
+      # collect reports
+      - store_test_results:
+          path: /tmp/test-results
+
+      - store_artifacts:
+          path: /tmp/test-results
+          destination: test-results
+
 
   deploy:
-    machine: *id001
+    working_directory: ~/app
+    docker:
+      - image: circleci/ruby:2.5.0
     steps:
       - checkout
-      - run: npm install
-      - run: npm run deploy:staging
+
+      - run:
+          name: Installing deployment dependencies
+          working_directory: /
+          command: |
+            sudo apt-get -y -qq update
+            sudo apt-get install python-pip python-dev build-essential
+            sudo pip install awsebcli --upgrade
+
+      - run:
+          name: Deploying
+          command: eb deploy $CIRCLE_BRANCH-admin
 
 workflows:
   version: 2
-  build-and-deploy:
+  build:
     jobs:
-      - build
+      - test:
+        filters:
+          branches:
+            only:
+              - staging
+              - master
       - deploy:
-        requires:
-          - build
+          requires:
+            - test
+          filters:
+            branches:
+              only:
+                - staging
+                - master
