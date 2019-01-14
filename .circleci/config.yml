@@ -24,8 +24,7 @@ jobs:
             git submodule sync
             git submodule update --init --recursive
             find . -name "*.pyc" -exec rm -rf {} \;
-      - restore_cache:
-          key: v1-dependencies-{{ checksum "requirements.txt" }}
+   
       - run:
           name: install global dependencies
           command: |
